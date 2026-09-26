@@ -1,31 +1,55 @@
-const Produto = require("../models/produtoModel");
+import Produto from "../models/produtoModel";
 
-const produtos = [
-    new Produto({ id: 1, nome: "Notebook", preco: 3500}),
-    new Produto({ id: 2, nome: "Mouse", preco: 120})
-];
-
-function listar(){
-    return produtos;
+async function listar() {
+    return await Produto.findAll();
 }
 
-function buscarPorId(id) {
-    return produtos.find(p => p.id === Number(id));
+async function buscarPorId(id: number) {
+    return await Produto.findByPk(id);
 }
 
-function criar(dados) {
+async function criar(dados: { nome: string; preco: number }) {
     if (!dados.nome || dados.preco == null) {
         throw new Error("nome e preco são obrigatorios");
     }
 
-    const novoProduto = new Produto({
-        id: produtos.length + 1,
+    return await Produto.create({
         nome: dados.nome,
         preco: dados.preco
     });
+}
 
-    produto.push(novoProduto);
+async function atualizar(
+    id: number,
+    dados: { nome: string; preco: number }
+) {
+    const produto = await Produto.findByPk(id);
+
+    if (!produto) {
+        return null;
+    }
+
+    await produto.update(dados);
+
     return produto;
 }
 
-module.exports = {listar, buscarPorId, criar};
+async function excluir(id: number) {
+    const produto = await Produto.findByPk(id);
+
+    if (!produto) {
+        return false;
+    }
+
+    await produto.destroy();
+
+    return true;
+}
+
+export {
+    listar,
+    buscarPorId,
+    criar,
+    atualizar,
+    excluir
+};
